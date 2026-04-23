@@ -1,0 +1,53 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local secrets
+.env
+.env.*
+!.env.example
+model.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Backend runtime data
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# TypeScript build artifacts emitted beside configs
+frontend/*.js
+frontend/*.d.ts
+!frontend/src/**/*.d.ts
+
+# Logs and local artifacts
+*.log
+artifacts/
+
+# Local tool bootstrap downloads
+.tools/
+
+# Package manager cache noise
+.npm/
+.bun-install-cache/

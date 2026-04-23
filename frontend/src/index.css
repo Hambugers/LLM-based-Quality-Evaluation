@@ -1,0 +1,42 @@
+@import "@xyflow/react/dist/style.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-family: Bahnschrift, "Microsoft YaHei UI", "Segoe UI", sans-serif;
+  background: #080b0f;
+  color: #e7eef4;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(17, 29, 38, 0.92), rgba(8, 11, 15, 0.98) 42%),
+    radial-gradient(circle at 12% 8%, rgba(44, 183, 170, 0.16), transparent 31%),
+    radial-gradient(circle at 92% 18%, rgba(220, 168, 74, 0.12), transparent 29%),
+    #080b0f;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.react-flow__node-default {
+  border: 1px solid rgba(115, 138, 148, 0.35);
+  background: rgba(15, 23, 28, 0.95);
+  color: #dce7ed;
+  border-radius: 8px;
+  width: 172px;
+  min-height: 58px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
+}
+
+.react-flow__handle {
+  background: #4dbab0;
+}

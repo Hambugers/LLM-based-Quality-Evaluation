@@ -1,0 +1,15 @@
+from __future__ import annotations
+
+from datetime import UTC, datetime
+
+
+def utc_now() -> datetime:
+    return datetime.now(tz=UTC)
+
+
+def utc_now_iso() -> str:
+    return utc_now().isoformat().replace("+00:00", "Z")
+
+
+def duration_ms(started_at: datetime, ended_at: datetime) -> int:
+    return int((ended_at - started_at).total_seconds() * 1000)
