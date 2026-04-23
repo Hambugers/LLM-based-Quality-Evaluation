@@ -50,3 +50,6 @@ artifacts/
 # Package manager cache noise
 .npm/
 .bun-install-cache/
+
+spec.md
+题目.md

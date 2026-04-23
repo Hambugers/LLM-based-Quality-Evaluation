@@ -110,6 +110,15 @@ uv sync --group dev
 uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
+如果不使用 `uv`，也可以在项目根目录用 `requirements.txt` 安装后端运行依赖：
+
+```powershell
+python -m venv backend\.venv
+backend\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn app.main:app --app-dir backend --reload --host 0.0.0.0 --port 8001
+```
+
 健康检查：
 
 ```text
