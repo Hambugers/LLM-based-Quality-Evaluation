@@ -1,4 +1,4 @@
-import { buildEvaluationFormData, evaluateWithFallback } from "./api";
+import { buildEvaluationFormData, evaluateWithFallback, syncEvaluation } from "./api";
 
 describe("buildEvaluationFormData", () => {
   it("serializes text fields and uploaded files using the shared API contract", () => {
@@ -47,5 +47,26 @@ describe("evaluateWithFallback", () => {
     expect(syncTransport).toHaveBeenCalledTimes(1);
     expect(result.mode).toBe("sync");
     expect(result.payload.run_id).toBe("run_sync");
+  });
+});
+
+describe("syncEvaluation", () => {
+  it("uses same-origin API paths by default for packaged deployments", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, run_id: "run_packaged" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    await syncEvaluation({
+      user_question: "30万以内商务车推荐",
+      model_answer: "推荐 GL8。",
+      images: [],
+      text_model: "",
+      vision_model: "",
+    });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith("/api/evaluate", expect.any(Object));
   });
 });

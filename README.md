@@ -149,6 +149,47 @@ bun install
 
 如果当前 shell 的 `node` 命令命中 WindowsApps 并出现 `Access is denied`，把可用 Node 放到 PATH 前面后再执行前端命令。
 
+## Build Windows ZIP Package
+
+如果要交付给没有 Python、Node、uv、Bun 的 Windows 机器，使用一键 ZIP 包：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\build_windows_zip.ps1
+```
+
+如果在 WSL/Linux 里打包 Windows ZIP，使用：
+
+```bash
+python3 scripts/build_windows_zip.py
+```
+
+输出文件：
+
+```text
+artifacts/windows/LLM-Evaluation-Demo.zip
+```
+
+ZIP 解压后双击 `Start.bat` 即可启动。启动脚本会显示日志窗口、自动选择本地端口、启动 FastAPI 服务，并打开默认浏览器。
+
+包结构：
+
+```text
+LLM-Evaluation-Demo/
+  Start.bat
+  app/
+    backend/
+    frontend_dist/
+    images/
+    model.txt
+  runtime/
+    python/
+  data/
+    uploads/
+  logs/
+```
+
+注意：`model.txt` 会被复制进 ZIP 包。如果其中包含 OpenRouter API Key，请把生成的 ZIP 当作含密钥文件管理，不要公开分发。
+
 ## API
 
 ### `GET /health`

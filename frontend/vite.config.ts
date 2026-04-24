@@ -20,6 +20,7 @@ const config: UserConfig & {
     host: "0.0.0.0",
     port: 5173,
     proxy: {
+      "/api": "http://127.0.0.1:8001",
       "/sample-assets": "http://127.0.0.1:8001",
       "/uploads": "http://127.0.0.1:8001",
     },

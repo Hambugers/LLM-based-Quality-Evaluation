@@ -64,6 +64,25 @@ def test_health_endpoint(tmp_path: Path) -> None:
     assert response.json() == {"ok": True}
 
 
+def test_serves_packaged_frontend_index(tmp_path: Path) -> None:
+    frontend_dist = tmp_path / "frontend_dist"
+    frontend_dist.mkdir()
+    (frontend_dist / "index.html").write_text("<html><body>packaged app</body></html>", encoding="utf-8")
+    client = TestClient(
+        create_app(
+            test_overrides={
+                "uploads_dir": tmp_path / "uploads",
+                "frontend_dist_dir": frontend_dist,
+            }
+        )
+    )
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "packaged app" in response.text
+
+
 def test_evaluate_endpoint_accepts_multipart(tmp_path: Path) -> None:
     client = TestClient(
         create_app(

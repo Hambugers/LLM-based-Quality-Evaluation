@@ -8,6 +8,7 @@ from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -22,13 +23,21 @@ def create_app(
     workflow_service: WorkflowService | Any | None = None,
 ) -> FastAPI:
     overrides = test_overrides or {}
-    backend_root = Path(__file__).resolve().parents[1]
-    project_root = Path(__file__).resolve().parents[2]
+    env = {**os.environ, **overrides.get("env", {})}
+    project_root = resolve_path(env.get("LLM_EVAL_PROJECT_ROOT")) or Path(__file__).resolve().parents[2]
     settings = Settings.load(
-        env={**os.environ, **overrides.get("env", {})},
-        model_file_path=overrides.get("model_file_path", project_root / "model.txt"),
-        uploads_dir=overrides.get("uploads_dir"),
-        sample_assets_dir=overrides.get("sample_assets_dir", project_root / "images"),
+        env=env,
+        model_file_path=overrides.get("model_file_path")
+        or resolve_path(env.get("LLM_EVAL_MODEL_FILE"))
+        or project_root / "model.txt",
+        uploads_dir=overrides.get("uploads_dir")
+        or resolve_path(env.get("LLM_EVAL_UPLOADS_DIR")),
+        sample_assets_dir=overrides.get("sample_assets_dir")
+        or resolve_path(env.get("LLM_EVAL_SAMPLE_ASSETS_DIR"))
+        or project_root / "images",
+        frontend_dist_dir=overrides.get("frontend_dist_dir")
+        or resolve_path(env.get("LLM_EVAL_FRONTEND_DIST_DIR"))
+        or project_root / "frontend" / "dist",
         project_root=project_root,
     )
     settings.uploads_dir.mkdir(parents=True, exist_ok=True)
@@ -128,7 +137,42 @@ def create_app(
 
         return StreamingResponse(stream(), media_type="text/event-stream")
 
+    mount_frontend(app, settings.frontend_dist_dir)
+
     return app
+
+
+def resolve_path(value: str | None) -> Path | None:
+    if not value:
+        return None
+    return Path(value).expanduser().resolve()
+
+
+def mount_frontend(app: FastAPI, frontend_dist_dir: Path) -> None:
+    index_html = frontend_dist_dir / "index.html"
+    if not index_html.exists():
+        return
+
+    assets_dir = frontend_dist_dir / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="frontend-assets")
+
+    @app.get("/", include_in_schema=False)
+    async def frontend_index() -> FileResponse:
+        return FileResponse(index_html)
+
+    @app.get("/{path:path}", include_in_schema=False)
+    async def frontend_fallback(path: str) -> FileResponse:
+        if path.startswith(("api/", "uploads/", "sample-assets/")) or path in {"health", "openapi.json"}:
+            raise HTTPException(status_code=404, detail="Not found")
+        requested = (frontend_dist_dir / path).resolve()
+        try:
+            requested.relative_to(frontend_dist_dir.resolve())
+        except ValueError:
+            raise HTTPException(status_code=404, detail="Not found") from None
+        if requested.is_file():
+            return FileResponse(requested)
+        return FileResponse(index_html)
 
 
 def build_evaluation_request(

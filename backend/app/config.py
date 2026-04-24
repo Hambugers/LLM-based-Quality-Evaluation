@@ -20,6 +20,7 @@ class Settings:
     openrouter_max_retries: int
     uploads_dir: Path
     sample_assets_dir: Path
+    frontend_dist_dir: Path
     project_root: Path
 
     @classmethod
@@ -29,6 +30,7 @@ class Settings:
         model_file_path: Path | None = None,
         uploads_dir: Path | None = None,
         sample_assets_dir: Path | None = None,
+        frontend_dist_dir: Path | None = None,
         project_root: Path | None = None,
     ) -> "Settings":
         raw_env = dict(os.environ if env is None else env)
@@ -58,6 +60,7 @@ class Settings:
 
         resolved_uploads_dir = uploads_dir or resolved_project_root / "backend" / "uploads"
         resolved_sample_assets_dir = sample_assets_dir or resolved_project_root / "images"
+        resolved_frontend_dist_dir = frontend_dist_dir or resolved_project_root / "frontend" / "dist"
 
         return cls(
             openrouter_api_key=api_key,
@@ -68,6 +71,7 @@ class Settings:
             openrouter_max_retries=int(raw_env.get("OPENROUTER_MAX_RETRIES", 2)),
             uploads_dir=resolved_uploads_dir,
             sample_assets_dir=resolved_sample_assets_dir,
+            frontend_dist_dir=resolved_frontend_dist_dir,
             project_root=resolved_project_root,
         )
 
